@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Loader, Plus, Trash2 } from 'lucide-react';
 import StickerCard from '../components/StickerCard';
 
-export const CollectionsPage = () => {
+const CollectionsPage = () => {
     const { user } = useAuth();
     const [collections, setCollections] = useState([]);
     const [userStickers, setUserStickers] = useState([]);
@@ -182,3 +182,5 @@ export const CollectionsPage = () => {
     );
 
 }
+
+export default CollectionsPage;
