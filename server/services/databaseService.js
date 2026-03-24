@@ -207,6 +207,36 @@ export const getUserProfile = async (userId) => {
 };
 
 /**
+ * Get stickers created by a specific user
+ */
+export const getStickersByUserId = async (userId) => {
+  try {
+    const { data, error } = await supabase
+      .from('stickers')
+      .select(`
+        id,
+        user_id,
+        name,
+        creator_email,
+        video_url,
+        thumbnail_url,
+        duration,
+        uses_count,
+        created_at,
+        users(email)
+      `)
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching user stickers:', error.message);
+    return [];
+  }
+};
+
+/**
  * Create or update user profile
  */
 export const upsertUser = async (userId, email) => {

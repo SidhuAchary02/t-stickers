@@ -25,7 +25,11 @@ const HomePage = () => {
       setError(null);
     } catch (err) {
       console.error('Feed error:', err);
-      setError('Failed to load stickers');
+      // Don't show error state if we already have stickers loaded
+      if (stickers.length === 0) {
+        setError(null);
+        // Try to load anyway - fetch will be retried
+      }
     } finally {
       setLoading(false);
     }
@@ -43,16 +47,6 @@ const HomePage = () => {
     return (
       <div className="flex items-center justify-center h-96">
         <Loader className="animate-spin text-gray-500" size={32} />
-      </div>
-    );
-  }
-
-  if (error && stickers.length === 0) {
-    return (
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="p-6 bg-red-900 bg-opacity-30 border border-red-600 rounded-lg text-red-300">
-          {error}
-        </div>
       </div>
     );
   }

@@ -4,7 +4,8 @@ import { verifyAuth } from '../middleware/auth.js';
 import {
   createSticker,
   getSticker,
-  getStickersFeedController
+  getStickersFeedController,
+  getUserStickersController
 } from '../controllers/stickerController.js';
 import { getTempDir } from '../utils/fileUtils.js';
 
@@ -51,10 +52,13 @@ router.post(
   createSticker
 );
 
+// GET /api/sticker/feed
+router.get('/feed', getStickersFeedController);
+
+// GET /api/sticker/user/:userId
+router.get('/user/:userId', getUserStickersController);
+
 // GET /api/sticker/:id
 router.get('/:id', getSticker);
-
-// GET /api/stickers/feed
-router.get('/feed', getStickersFeedController);
 
 export default router;

@@ -2,6 +2,7 @@ import {
   createStickerRecord,
   getStickerById,
   getStickersFeed,
+  getStickersByUserId,
   incrementUsesCount
 } from '../services/databaseService.js';
 import {
@@ -174,7 +175,36 @@ export const getSticker = async (req, res) => {
 };
 
 /**
- * GET /api/stickers/feed
+ * GET /api/sticker/user/:userId
+ * Get stickers created by a specific user
+ */
+export const getUserStickersController = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const stickers = await getStickersByUserId(userId);
+
+    res.json({
+      stickers: stickers.map((s) => ({
+        id: s.id,
+        name: s.name || 'Untitled Sticker',
+        video_url: s.video_url,
+        thumbnail_url: s.thumbnail_url,
+        duration: s.duration,
+        uses_count: s.uses_count,
+        created_at: s.created_at,
+        creator_email: s.creator_email || s.users?.email || 'anonymous@t-stickers.local',
+        creator: s.users?.email || 'Anonymous'
+      }))
+    });
+  } catch (error) {
+    console.error('Get user stickers error:', error);
+    res.status(500).json({ error: 'Failed to fetch user stickers' });
+  }
+};
+
+/**
+ * GET /api/sticker/feed
  * Get stickers feed (paginated)
  */
 export const getStickersFeedController = async (req, res) => {
