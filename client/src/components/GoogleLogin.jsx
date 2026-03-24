@@ -13,12 +13,13 @@ export const GoogleLogin = ({ onSuccess = null }) => {
       setLoading(true);
       setError(null);
 
-      console.log('Initiating OAuth login with redirectTo:', `${window.location.origin}/`);
+      const appUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+      console.log('Initiating OAuth login with redirectTo:', `${appUrl}/`);
 
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${appUrl}/`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent'
