@@ -33,7 +33,8 @@ const Navigation = () => {
     <nav className="sticky top-0 z-50 bg-dark-secondary border-b border-dark-tertiary">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex gap-1 items-center font-bold text-lg text-white">
-          <AudioWaveform size={20}/>
+          {/* <AudioWaveform size={20}/> */}
+          <img src="./public/t-sticker-logo.svg" size={14} alt="t-stickers Logo" />
             t-stickers
         </Link>
 

@@ -1,6 +1,6 @@
-# 🎬 t-stickers Platform - MVP
+# ![t-stickers logo](./client/public/t-sticker-logo.svg) t-stickers Platform
 
-A production-ready platform for creating, sharing, and discovering short looping "t-stickers" (video + audio combinations).
+A production-ready platform for creating, sharing, and discovering `talking-stickers`🗣️
 
 ## 🎯 Features
 
