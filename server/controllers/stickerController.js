@@ -3,14 +3,15 @@ import {
   getStickerById,
   getStickersFeed,
   getStickersByUserId,
-  incrementUsesCount
+  incrementUsesCount,
+  deleteStickerRecord
 } from '../services/databaseService.js';
 import {
   processSticker,
   generateThumbnail,
   getVideoMetadata
 } from '../services/ffmpegService.js';
-import { uploadToStorage } from '../services/storageService.js';
+import { deleteFromStorage } from '../services/storageService.js';
 import {
   getTempDir,
   generateFilename,
@@ -21,6 +22,52 @@ import {
 } from '../utils/fileUtils.js';
 import path from 'path';
 import fs from 'fs';
+
+/**
+ * DELETE /api/sticker/:id
+ * Delete a sticker (only owner can delete)
+ */
+export const deleteSticker = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Get sticker to verify ownership
+    const sticker = await getStickerById(id);
+
+    if (!sticker) {
+      return res.status(404).json({ error: 'Sticker not found' });
+    }
+
+    // Only owner can delete
+    if (sticker.user_id !== req.user.id) {
+      return res.status(403).json({ error: 'Unauthorized - you can only delete your own stickers' });
+    }
+
+    // Delete from storage
+    const videoKey = `stickers/${req.user.id}/${sticker.video_url.split('/').pop()}`;
+    const thumbnailKey = `stickers/${req.user.id}/thumbs/${sticker.thumbnail_url.split('/').pop()}`;
+
+    try {
+      await deleteFromStorage('t-stickers', videoKey);
+      await deleteFromStorage('t-stickers', thumbnailKey);
+    } catch (storageErr) {
+      console.warn('Storage deletion warning:', storageErr);
+      // Continue even if storage deletion fails
+    }
+
+    // Delete from database
+    await deleteStickerRecord(id);
+
+    res.json({ success: true, message: 'Sticker deleted' });
+  } catch (error) {
+    console.error('Delete sticker error:', error);
+    res.status(500).json({ error: error.message || 'Failed to delete sticker' });
+  }
+};
 
 /**
  * POST /api/sticker/create

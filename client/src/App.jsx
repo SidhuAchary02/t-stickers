@@ -34,7 +34,7 @@ const Navigation = () => {
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex gap-1 items-center font-bold text-lg text-white">
           {/* <AudioWaveform size={20}/> */}
-          <img src="./public/t-sticker-logo.svg" size={14} alt="t-stickers Logo" />
+          <img src="/t-sticker-logo.svg" size={14} alt="Logo" />
             t-stickers
         </Link>
 
@@ -80,7 +80,7 @@ const Navigation = () => {
               target='_blank'
               className="border border-zinc-700 rounded-lg p-1"
             >
-              <img src="/public/GitHub_Invertocat_White_Clearspace.svg" width={30}  alt="GitHub Logo" />
+              <img src="/GitHub.svg" width={30}  alt="GitHub Logo" />
             </Link>
           )}
         </div>

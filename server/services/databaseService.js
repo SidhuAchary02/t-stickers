@@ -207,6 +207,19 @@ export const getUserProfile = async (userId) => {
 };
 
 /**
+ * Delete a sticker record
+ */
+export const deleteStickerRecord = async (stickerId) => {
+  const { error } = await supabaseAdmin
+    .from('stickers')
+    .delete()
+    .eq('id', stickerId);
+
+  if (error) throw error;
+  return true;
+};
+
+/**
  * Get stickers created by a specific user
  */
 export const getStickersByUserId = async (userId) => {

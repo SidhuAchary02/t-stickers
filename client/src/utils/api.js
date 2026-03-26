@@ -36,7 +36,8 @@ export const stickerAPI = {
   getById: (id) => apiClient.get(`/sticker/${id}`),
   getFeed: (limit = 20, offset = 0) =>
     apiClient.get('/sticker/feed', { params: { limit, offset } }),
-  getByUser: (userId) => apiClient.get(`/sticker/user/${userId}`)
+  getByUser: (userId) => apiClient.get(`/sticker/user/${userId}`),
+  delete: (id) => apiClient.delete(`/sticker/${id}`)
 };
 
 // Collection API

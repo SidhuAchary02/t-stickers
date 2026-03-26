@@ -5,7 +5,7 @@ import ShareButton from '../components/ShareButton';
 import MetaTags from '../components/MetaTags';
 import { stickerAPI, collectionAPI } from '../utils/api';
 import { useAuth } from '../hooks/useAuth';
-import { Loader, ChevronLeft, Bookmark, BookmarkCheck } from 'lucide-react';
+import { Loader, ChevronLeft, Bookmark, BookmarkCheck, Trash2 } from 'lucide-react';
 
 const ViewStickerPage = () => {
   const { id } = useParams();
@@ -19,6 +19,9 @@ const ViewStickerPage = () => {
   const [selectedCollectionId, setSelectedCollectionId] = useState(null);
   const [showCollectionMenu, setShowCollectionMenu] = useState(false);
   const [addingToCollection, setAddingToCollection] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const isOwner = user && sticker && sticker.user_id === user.id;
 
   useEffect(() => {
     const loadSticker = async () => {
@@ -61,6 +64,23 @@ const ViewStickerPage = () => {
       console.error('Add to collection error:', error);
     } finally {
       setAddingToCollection(false);
+    }
+  };
+
+  const handleDeleteSticker = async () => {
+    if (!confirm('Are you sure you want to delete this sticker? This cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setDeleting(true);
+      await stickerAPI.delete(sticker.id);
+      // Redirect to home after successful deletion
+      navigate('/');
+    } catch (error) {
+      console.error('Delete sticker error:', error);
+      alert('Failed to delete sticker');
+      setDeleting(false);
     }
   };
 
@@ -182,12 +202,23 @@ const ViewStickerPage = () => {
             onClick={() => {
               const url = `${window.location.origin}/s/${sticker.id}`;
               navigator.clipboard.writeText(url);
-              alert('URL copied to clipboard!');
             }}
             className="w-full px-4 py-2 bg-dark-secondary hover:bg-dark-tertiary text-gray-300 rounded-lg transition-colors text-sm"
           >
             Copy Link
           </button>
+
+          {/* Delete Button (only for owner) */}
+          {isOwner && (
+            <button
+              onClick={handleDeleteSticker}
+              disabled={deleting}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 text-white rounded-lg transition-colors"
+            >
+              <Trash2 size={16} />
+              {deleting ? 'Deleting...' : 'Delete Sticker'}
+            </button>
+          )}
         </div>
       </div>
     </div>
