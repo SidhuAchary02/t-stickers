@@ -11,7 +11,7 @@ import {
   generateThumbnail,
   getVideoMetadata
 } from '../services/ffmpegService.js';
-import { deleteFromStorage } from '../services/storageService.js';
+import { uploadToStorage, deleteFromStorage } from '../services/storageService.js';
 import {
   getTempDir,
   generateFilename,
