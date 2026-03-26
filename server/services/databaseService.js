@@ -267,3 +267,113 @@ export const upsertUser = async (userId, email) => {
   if (error) throw error;
   return data?.[0] || { id: userId, email };
 };
+
+/**
+ * Toggle like on a sticker
+ */
+export const toggleStickerLike = async (stickerId, userId) => {
+  // Check if like already exists
+  const { data: existingLike, error: queryError } = await supabase
+    .from('sticker_likes')
+    .select('id')
+    .eq('sticker_id', stickerId)
+    .eq('user_id', userId)
+    .single();
+
+  if (queryError && queryError.code !== 'PGRST116') throw queryError;
+
+  if (existingLike) {
+    // Unlike
+    const { error: deleteError } = await supabaseAdmin
+      .from('sticker_likes')
+      .delete()
+      .eq('sticker_id', stickerId)
+      .eq('user_id', userId);
+    
+    if (deleteError) throw deleteError;
+    return { liked: false };
+  } else {
+    // Like
+    const id = uuidv4();
+    const { error: insertError } = await supabaseAdmin
+      .from('sticker_likes')
+      .insert([
+        {
+          id,
+          sticker_id: stickerId,
+          user_id: userId,
+          created_at: new Date().toISOString()
+        }
+      ]);
+    
+    if (insertError) throw insertError;
+    return { liked: true };
+  }
+};
+
+/**
+ * Get like count for a sticker
+ */
+export const getStickerLikeCount = async (stickerId) => {
+  const { count, error } = await supabase
+    .from('sticker_likes')
+    .select('*', { count: 'exact', head: true })
+    .eq('sticker_id', stickerId);
+
+  if (error) throw error;
+  return count || 0;
+};
+
+/**
+ * Check if user liked a sticker
+ */
+export const checkUserLiked = async (stickerId, userId) => {
+  const { data, error } = await supabase
+    .from('sticker_likes')
+    .select('id')
+    .eq('sticker_id', stickerId)
+    .eq('user_id', userId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return !!data;
+};
+
+/**
+ * Get or create "Favorites" collection for user
+ */
+export const getOrCreateFavoritesCollection = async (userId) => {
+  // Try to get existing Favorites collection
+  const { data: existing, error: queryError } = await supabase
+    .from('collections')
+    .select('id, name')
+    .eq('user_id', userId)
+    .eq('name', 'Favorites')
+    .single();
+
+  if (!queryError || (queryError && queryError.code === 'PGRST116')) {
+    if (existing) {
+      return existing;
+    }
+    
+    // Create Favorites collection
+    const id = uuidv4();
+    const { data: newCollection, error: createError } = await supabaseAdmin
+      .from('collections')
+      .insert([
+        {
+          id,
+          user_id: userId,
+          name: 'Favorites',
+          created_at: new Date().toISOString()
+        }
+      ])
+      .select()
+      .single();
+
+    if (createError) throw createError;
+    return newCollection;
+  }
+
+  throw queryError;
+};

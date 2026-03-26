@@ -4,7 +4,12 @@ import {
   getStickersFeed,
   getStickersByUserId,
   incrementUsesCount,
-  deleteStickerRecord
+  deleteStickerRecord,
+  toggleStickerLike,
+  getStickerLikeCount,
+  checkUserLiked,
+  getOrCreateFavoritesCollection,
+  addToCollection
 } from '../services/databaseService.js';
 import {
   processSticker,
@@ -290,5 +295,48 @@ export const getStickersFeedController = async (req, res) => {
       error: error.message || 'Failed to fetch feed',
       details: error.message 
     });
+  }
+};
+/**
+ * POST /api/sticker/:id/like
+ * Toggle like on a sticker (auth required)
+ */
+export const toggleLike = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const { id } = req.params;
+    const result = await toggleStickerLike(id, req.user.id);
+    res.json(result);
+  } catch (error) {
+    console.error('Toggle like error:', error);
+    res.status(500).json({ error: 'Failed to toggle like' });
+  }
+};
+
+/**
+ * POST /api/sticker/:id/star
+ * Add sticker to Favorites collection (auth required)
+ */
+export const starSticker = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const { id } = req.params;
+
+    // Get or create Favorites collection
+    const favCollection = await getOrCreateFavoritesCollection(req.user.id);
+
+    // Add sticker to Favorites
+    await addToCollection(favCollection.id, id);
+
+    res.json({ success: true, message: 'Added to Favorites' });
+  } catch (error) {
+    console.error('Star sticker error:', error);
+    res.status(500).json({ error: 'Failed to add to favorites' });
   }
 };

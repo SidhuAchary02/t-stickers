@@ -6,7 +6,9 @@ import {
   getSticker,
   getStickersFeedController,
   getUserStickersController,
-  deleteSticker
+  deleteSticker,
+  toggleLike,
+  starSticker
 } from '../controllers/stickerController.js';
 import { getTempDir } from '../utils/fileUtils.js';
 
@@ -64,5 +66,11 @@ router.get('/:id', getSticker);
 
 // DELETE /api/sticker/:id
 router.delete('/:id', verifyAuth, deleteSticker);
+
+// POST /api/sticker/:id/like
+router.post('/:id/like', verifyAuth, toggleLike);
+
+// POST /api/sticker/:id/star
+router.post('/:id/star', verifyAuth, starSticker);
 
 export default router;

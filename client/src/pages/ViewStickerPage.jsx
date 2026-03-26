@@ -5,7 +5,7 @@ import ShareButton from '../components/ShareButton';
 import MetaTags from '../components/MetaTags';
 import { stickerAPI, collectionAPI } from '../utils/api';
 import { useAuth } from '../hooks/useAuth';
-import { Loader, ChevronLeft, Bookmark, BookmarkCheck, Trash2 } from 'lucide-react';
+import { Loader, ChevronLeft, Bookmark, BookmarkCheck, Trash2, Heart, Star } from 'lucide-react';
 
 const ViewStickerPage = () => {
   const { id } = useParams();
@@ -20,6 +20,10 @@ const ViewStickerPage = () => {
   const [showCollectionMenu, setShowCollectionMenu] = useState(false);
   const [addingToCollection, setAddingToCollection] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [liking, setLiking] = useState(false);
+  const [starring, setStarring] = useState(false);
 
   const isOwner = user && sticker && sticker.user_id === user.id;
 
@@ -81,6 +85,43 @@ const ViewStickerPage = () => {
       console.error('Delete sticker error:', error);
       alert('Failed to delete sticker');
       setDeleting(false);
+    }
+  };
+
+  const handleToggleLike = async () => {
+    if (!user) {
+      alert('Please log in to like stickers');
+      return;
+    }
+
+    try {
+      setLiking(true);
+      await stickerAPI.toggleLike(sticker.id);
+      setIsLiked(!isLiked);
+      setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+    } catch (error) {
+      console.error('Toggle like error:', error);
+      alert('Failed to toggle like');
+    } finally {
+      setLiking(false);
+    }
+  };
+
+  const handleStarSticker = async () => {
+    if (!user) {
+      alert('Please log in to favorite stickers');
+      return;
+    }
+
+    try {
+      setStarring(true);
+      await stickerAPI.star(sticker.id);
+      alert('Added to Favorites!');
+    } catch (error) {
+      console.error('Star sticker error:', error);
+      alert('Failed to add to favorites');
+    } finally {
+      setStarring(false);
     }
   };
 
@@ -155,6 +196,33 @@ const ViewStickerPage = () => {
               <p className="text-xs text-gray-500">Duration</p>
               <p className="text-xl font-bold">{sticker.duration}s</p>
             </div>
+          </div>
+
+          {/* Like and Heart Buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleToggleLike}
+              disabled={liking || !user}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                isLiked
+                  ? 'bg-red-600 hover:bg-red-700 text-white'
+                  : 'bg-dark-secondary hover:bg-dark-tertiary text-gray-300'
+              } disabled:opacity-50`}
+              title={user ? 'Like this sticker' : 'Log in to like'}
+            >
+              <Heart size={16} fill={isLiked ? 'currentColor' : 'none'} />
+              <span className="text-sm">{likesCount}</span>
+            </button>
+
+            <button
+              onClick={handleStarSticker}
+              disabled={starring || !user || isOwner}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-700 disabled:opacity-50 text-white rounded-lg transition-colors text-sm"
+              title={isOwner ? 'Cannot star your own sticker' : user ? 'Add to Favorites' : 'Log in to favorite'}
+            >
+              <Star size={16} />
+              Star
+            </button>
           </div>
 
           {/* Share Button */}

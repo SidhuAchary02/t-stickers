@@ -37,7 +37,9 @@ export const stickerAPI = {
   getFeed: (limit = 20, offset = 0) =>
     apiClient.get('/sticker/feed', { params: { limit, offset } }),
   getByUser: (userId) => apiClient.get(`/sticker/user/${userId}`),
-  delete: (id) => apiClient.delete(`/sticker/${id}`)
+  delete: (id) => apiClient.delete(`/sticker/${id}`),
+  toggleLike: (id) => apiClient.post(`/sticker/${id}/like`),
+  star: (id) => apiClient.post(`/sticker/${id}/star`)
 };
 
 // Collection API
