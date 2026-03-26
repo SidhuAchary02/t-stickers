@@ -76,10 +76,11 @@ const Navigation = () => {
             </>
           ) : (
             <Link
-              to="/login"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm"
+              to="https://github.com/SidhuAchary02/t-stickers"
+              target='_blank'
+              className="border border-zinc-700 rounded-lg p-1"
             >
-              Login
+              <img src="/public/GitHub_Invertocat_White_Clearspace.svg" width={30}  alt="GitHub Logo" />
             </Link>
           )}
         </div>
