@@ -206,6 +206,7 @@ export const getSticker = async (req, res) => {
 
     res.json({
       id: sticker.id,
+      user_id: sticker.user_id,
       name: sticker.name || 'Untitled Sticker',
       video_url: sticker.video_url,
       thumbnail_url: sticker.thumbnail_url,
